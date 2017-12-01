@@ -2,11 +2,12 @@ import React from 'react';
 import { StyleSheet, 
   Text,
    View,
-   PanResponder 
+   Animated,
 
 } from 'react-native';
 import Deck from './src/Deck';
 import {Card, Button} from 'react-native-elements';
+
 
 const DATA = [
   { id: 1, text: 'Card #1', uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg' },
@@ -20,6 +21,7 @@ const DATA = [
 ];
 
 export default class App extends React.Component {
+
   renderCard(item){
     return (
         <Card
@@ -42,14 +44,35 @@ export default class App extends React.Component {
     );
   }
 
+  renderNoMoreCards(){
+    return (
+      <Card>
+        <Text style={{marginBottom: 10}}>
+          There is no more content
+        </Text>
+
+        <Button
+        icon={{name:'code'}}
+        backgroundColor="#03A9F4"
+        title="View Now!"
+        >
+
+          </Button>
+      </Card>
+
+    );
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Deck 
-        data = {DATA}
-        renderCard={this.renderCard}
-        />
-      </View>
+     
+     <View style={styles.container}>
+       <Deck 
+       data = {DATA}
+       renderCard={this.renderCard}
+       renderNoMoreCards={this.renderNoMoreCards}
+       />
+      </View>  
     );
   }
 }
