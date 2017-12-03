@@ -4,8 +4,8 @@ import {
     Animated,
     PanResponder,
     Dimensions,
-    Platform,
-    ToastAndroid
+    LayoutAnimation,
+    UIManager
 } from 'react-native';
 
 
@@ -15,6 +15,18 @@ const SWIPE_OUT_DURATION = 250;
 
 class Deck extends Component{
 
+
+    componentWillReceiveProps(nextProps){
+        console.log('new props received');
+        if(nextProps.data !== this.props.data){
+            this.setState({index: 0});
+        }
+    }
+
+    componentWillUpdate(){
+        UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+        LayoutAnimation.spring();
+    }
 
     //This is for default props
     static defaultProps = {
@@ -34,16 +46,8 @@ class Deck extends Component{
             onPanResponderRelease: (event,gesture) => {
                 if(gesture.dx > SWIPE_THRESHOLD){
                     this.forceSwipe('right');
-
-                    if(Platform.OS==='android'){
-                        ToastAndroid.show('Like!!!',ToastAndroid.SHORT);
-                    }
                 }else if (gesture.dx < -SWIPE_THRESHOLD){
-                    
                     this.forceSwipe('left');
-                    if(Platform.OS==='android'){
-                        ToastAndroid.show('Dislike!!!',ToastAndroid.SHORT);
-                    }
                 }else {
                     this.resetPosition();
                 }
@@ -98,7 +102,8 @@ class Deck extends Component{
 
         return {
             ...this.position.getLayout(),
-            transform: [{rotate}, {scale}]
+            transform: [{rotate}, {scale}],
+            zIndex: 99
         };
     }
 
@@ -107,6 +112,8 @@ class Deck extends Component{
            return this.props.renderNoMoreCards();
        } 
 
+       const dataSize = this.props.data.length;
+
         return this.props.data.map((item,i) => {
             if(i< this.state.index) {return null;}
 
@@ -114,7 +121,7 @@ class Deck extends Component{
                 return (
                     <Animated.View
                     key={item.id}
-                    style={[this.getCardStyle(),styles.cardStyle]}
+                    style={[this.getCardStyle(),styles.cardStyle, {zIndex: dataSize}]}
                     {...this.panResponder.panHandlers}
                     >
                         {this.props.renderCard(item)}
@@ -122,17 +129,21 @@ class Deck extends Component{
                 );
             }
             return (
-                <View key={item.id}
-                style={styles.cardStyle}
+                 //WARNING: If we use View instead of Animated.View then each time a card goes to the top of the stack
+                //the image will be re-fetched becausa it is converting a View component to Animated.View Component
+                 //So a simple solution to this fucking problem is wrapping the card component inside an Animated.View
+                <Animated.View key={item.id}
+                style={[styles.cardStyle,{zIndex: dataSize  - i}]}
                 >
                 {this.props.renderCard(item)}
-                </View>
+                </Animated.View>
                 
             );
         }).reverse();
     }
     
     render(){
+        console.log('rendering Deck...')
         return(
             <View
             >
@@ -145,7 +156,7 @@ class Deck extends Component{
 const styles={
     cardStyle: {
         position: 'absolute',
-        width: SCREEN_WIDTH
+        width: SCREEN_WIDTH,
     }
 }
 

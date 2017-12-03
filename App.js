@@ -20,7 +20,16 @@ const DATA = [
   { id: 8, text: 'Card #8', uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-01.jpg' },
 ];
 
+
+const DATA2 = [
+  { id: 9, text: 'Card #9', uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg' },
+  { id: 10, text: 'Card #10', uri: 'http://www.fluxdigital.co/wp-content/uploads/2015/04/Unsplash.jpg' },
+];
+
 export default class App extends React.Component {
+
+
+  state = {data: DATA}
 
   renderCard(item){
     return (
@@ -54,7 +63,7 @@ export default class App extends React.Component {
         <Button
         icon={{name:'code'}}
         backgroundColor="#03A9F4"
-        title="View Now!"
+        title="Reload!"
         >
 
           </Button>
@@ -63,23 +72,39 @@ export default class App extends React.Component {
     );
   }
 
+  reloadDeckData(){
+    console.log('reload data!!');
+    this._deck.props.data = {DATA2};
+  }
+
   render() {
     return (
      
      <View style={styles.container}>
        <Deck 
-       data = {DATA}
+       data = {this.state.data}
        renderCard={this.renderCard}
        renderNoMoreCards={this.renderNoMoreCards}
+       ref= {(c) => {this._deck = c}}
        />
       </View>  
     );
   }
+
+
+  componentDidMount(){
+    console.log(this._deck);
+  }
+
+
+
+
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    marginTop:10
   },
 });
